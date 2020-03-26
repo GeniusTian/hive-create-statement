@@ -18,4 +18,23 @@ public class Utils {
         }
         return prop;
     }
+
+    public static void putTableInfo() {
+
+    }
+
+    public static String getPartition(String... partitions) {
+        if (partitions == null) {
+            return "";
+        } else {
+            StringBuilder strPartition = new StringBuilder();
+            for (int i = 0; i < partitions.length; i++) {
+                strPartition.append(partitions[i]);
+                if (i < partitions.length - 1) {
+                    strPartition.append(", ");
+                }
+            }
+            return strPartition.toString();
+        }
+    }
 }

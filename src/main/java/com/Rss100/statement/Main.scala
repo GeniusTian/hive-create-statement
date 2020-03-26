@@ -2,7 +2,7 @@ package com.Rss100.statement
 
 import java.sql.ResultSet
 
-import com.Rss100.util.JDBCUtils
+import com.Rss100.util.{JDBCUtils, Utils}
 
 import scala.util.matching.Regex
 
@@ -10,28 +10,29 @@ import scala.util.matching.Regex
  * Created by wststart on 2020/3/25
  */
 object Main {
-  def main(args: Array[String]): Unit = {
+  def get_table_info(mysqlDatabase: String, mysqlTable: String, hiveDatabase: String, hiveTable: String, ifPartition: String, partitions: String*) = {
     val set: ResultSet = JDBCUtils.getQuery(
-      """
-        |
-        |SHOW FULL FIELDS FROM test.ads_info
-        |""".stripMargin)
+      s"""
+         |
+         |SHOW FULL FIELDS FROM $mysqlDatabase.$mysqlTable
+         |""".stripMargin)
     var create_head: String =
       s"""
-         |create external table if not exists ${args(0)}.${args(1)} (
+         |create external table if not exists $hiveDatabase.$hiveTable (
          |""".stripMargin
     var create_tail = ""
-    args(2) match {
+    val partition: String = Utils.getPartition(partitions: _*)
+    ifPartition match {
       case "1" => create_tail =
         s"""
-           |partitioned by(${args(3)} string)
+           |partitioned by($partition string)
            |row format delimited fields terminated by ','
-           |location '/hivetable/${args(1)}';
+           |location '/hivetable/$hiveDatabase/$hiveTable';
            |""".stripMargin
       case "2" => create_tail =
         s"""
            |row format delimited fields terminated by ','
-           |location '/hivetable/${args(1)}';
+           |location '/hivetable/$hiveDatabase/$hiveTable';
            |""".stripMargin
       case _ => throw new IllegalArgumentException("参数异常")
 
@@ -54,8 +55,10 @@ object Main {
       }
       create_head += field + " " + columnType + " comment '" + comment + "' ,\n"
     }
-    val str: String = create_head.substring(0, create_head.length - 2) + "\n)" + create_tail
-    println(str)
+    create_head.substring(0, create_head.length - 2) + "\n)" + create_tail
   }
 
+
+  def main(args: Array[String]): Unit = {
+  }
 }
