@@ -19,9 +19,7 @@ public class Utils {
         return prop;
     }
 
-    public static void putTableInfo() {
 
-    }
 
     public static String getPartition(String... partitions) {
         if (partitions == null) {
